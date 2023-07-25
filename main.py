@@ -45,7 +45,7 @@ def train_test_loop(model, device, train_loader, test_loader, EPOCHS=20):
     for epoch in range(EPOCHS):
         print("EPOCH:", epoch + 1)
         train(model, device, train_loader, optimizer, epoch)
-        misclassified_images, misclassified_labels, misclassified_predictions = test(model, device, test_loader)
-        lr_scheduler.step(model.test_losses[-1])  # Adjust learning rate based on validation loss
+        misclassified_images, misclassified_labels, misclassified_predictions, test_losses = test(model, device, test_loader)
+        lr_scheduler.step(test_losses[-1])  # Adjust learning rate based on validation loss
 
     return misclassified_images, misclassified_labels, misclassified_predictions

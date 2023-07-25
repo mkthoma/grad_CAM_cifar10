@@ -127,7 +127,7 @@ def train(model, device, train_loader, optimizer, epoch):
   train_accuracy.append(train_acc[-1])
   train_loss.append([x.item() for x in train_losses][-1])
   print(f"Train Accuracy: {round(train_accuracy[-1], 2)}%")
-  print(f"Train Loss: {round(train_loss[-1], 2)}%")
+  print(f"Train Loss: {round(train_loss[-1], 2)}")
 
 
 
@@ -160,11 +160,11 @@ def test(model, device, test_loader):
     test_losses.append(test_loss)
     test_acc.append(100. * correct / len(test_loader.dataset))
     print(f"Test Accuracy: {round(test_acc[-1], 2)}%")
-    print(f"Test Loss: {round(test_losses[-1], 2)}%")
+    print(f"Test Loss: {round(test_losses[-1], 2)}")
     print("\n")
 
 
-    return misclassified_images[:10], misclassified_labels[:10], misclassified_predictions[:10]
+    return misclassified_images[:10], misclassified_labels[:10], misclassified_predictions[:10], test_losses
 
 # stores all accuracy and losses as a dataframe
 def train_test_loss_accuracy(epochs):
