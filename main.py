@@ -32,7 +32,7 @@ def download_data(dataloader_args=dict(shuffle=True, batch_size=128, num_workers
     print("Unique classes of images are:", classes)
     return train_data, test_data, train_loader, test_loader, classes
 
-def select_model():
+def select_model(device):
     model = ResNet18().to(device)
     model.model_summary((3,32,32))
     return model
