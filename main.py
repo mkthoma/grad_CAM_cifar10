@@ -3,6 +3,7 @@ import torch
 import torch.optim as optim
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 from .utils import *
 from .models.resnet import *
 
