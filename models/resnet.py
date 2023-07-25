@@ -2,6 +2,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchsummary import summary
+from tqdm import tqdm
+import torch.optim as optim
+
 
 class BasicBlock(nn.Module):
     expansion = 1
