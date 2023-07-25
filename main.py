@@ -38,7 +38,7 @@ def select_model(device):
     return model
 
 def train_test_loop(model, device, train_loader, test_loader, EPOCHS=20):
-    optimizer = optim.SGD(cnn_model.parameters(), lr=0.01, momentum=0.9)
+    optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
     lr_scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=5, verbose=True)
 
     for epoch in range(EPOCHS):
