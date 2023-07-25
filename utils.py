@@ -3,6 +3,7 @@ import numpy as np
 from torchvision import datasets
 import albumentations as A
 import torchvision
+import cv2
 from albumentations.pytorch import ToTensorV2
 import matplotlib.pyplot as plt
 import numpy as np
@@ -34,6 +35,7 @@ class Cifar10SearchDataset(torchvision.datasets.CIFAR10):
 
     def __getitem__(self, index):
         image, label = self.data[index], self.targets[index]
+
         transformed = self.transform(image=image)
         image = transformed["image"]
         return image, label
@@ -42,22 +44,10 @@ class Cifar10SearchDataset(torchvision.datasets.CIFAR10):
         # Calculate the mean of the dataset
         return tuple(self.data.mean(axis=(0, 1, 2)) / 255)
 
-# function for train and test dataloader
-def train_test_dataloader(dataloader_args):
-
-  train_data = Cifar10SearchDataset(train=True, download=True, transform="train")
-  test_data = Cifar10SearchDataset(train=False, download=True, transform="test")
-
-  # train dataloader
-  train_loader = torch.utils.data.DataLoader(train_data, **dataloader_args)
-  # test dataloader
-  test_loader = torch.utils.data.DataLoader(test_data, **dataloader_args)
-  
-  # distinct classes of images
-  classes = train_data.classes
-  print("Unique classes of images are:", classes)
-  return train_loader, test_loader, classes
-
+# Function for train and test dataloader
+def dataloader(dataset, dataloader_args):
+    data_loader = torch.utils.data.DataLoader(dataset, **dataloader_args)
+    return data_loader
 
 
 ################################################################################################################################################
