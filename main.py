@@ -3,8 +3,8 @@ import torch
 import torch.optim as optim
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
-from utils import *
-from models.resnet import *
+from .utils import *
+from .models.resnet import *
 
 def select_cuda():
     SEED = 1
@@ -37,7 +37,7 @@ def select_model():
     model.model_summary((3,32,32))
     return model
 
-def train_test_loop(EPOCHS=20, model, device, train_loader, test_loader):
+def train_test_loop(model, device, train_loader, test_loader, EPOCHS=20):
     optimizer = optim.SGD(cnn_model.parameters(), lr=0.01, momentum=0.9)
     lr_scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=5, verbose=True)
 
@@ -48,19 +48,3 @@ def train_test_loop(EPOCHS=20, model, device, train_loader, test_loader):
         lr_scheduler.step(model.test_losses[-1])  # Adjust learning rate based on validation loss
 
     return misclassified_images, misclassified_labels, misclassified_predictions
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
