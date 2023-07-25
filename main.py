@@ -34,7 +34,7 @@ def download_data(dataloader_args=dict(shuffle=True, batch_size=128, num_workers
 
 def select_model(device):
     model = ResNet18().to(device)
-    model.model_summary((3,32,32))
+    model_summary(model, (3,32,32))
     return model
 
 def train_test_loop(model, device, train_loader, test_loader, EPOCHS=20):
