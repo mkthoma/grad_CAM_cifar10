@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
+from torchsummary import summary
 
 class BasicBlock(nn.Module):
     expansion = 1
@@ -72,8 +72,8 @@ def ResNet18():
 def ResNet34():
     return ResNet(BasicBlock, [3, 4, 6, 3])
 
-
-
+def model_summary(model, input_size):
+    summary(model, input_size)
 ################ TRAIN and TEST functions ###############
 
 # variables to store train and test accuracy/losses
