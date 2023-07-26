@@ -56,7 +56,7 @@ def find_max_lr(optimizer, criterion, model, train_loader, end_lr, num_iter, ste
 
 def max_lr(model, train_loader):
     # Define optimizer and criterion for loss
-    optimizer = optim.Adam(model.parameters(), lr=1e-5, weight_decay=1e-3)
+    optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
     criterion = nn.CrossEntropyLoss()
 
     # Specify end LR, number of iterations and step mode
