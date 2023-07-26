@@ -8,6 +8,7 @@ from albumentations.pytorch import ToTensorV2
 import matplotlib.pyplot as plt
 import numpy as np
 from pytorch_grad_cam import GradCAM
+from pytorch_grad_cam.utils.image import show_cam_on_image
 from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
 
 
@@ -169,58 +170,81 @@ def show_image_rgb(data_loader, classes):
     plt.show()
 
 # shows misclassified images
-def show_misclassified_img(misclassified_images, misclassified_labels, misclassified_predictions, classes):
-    print("Misclassified Images:")
-    fig = plt.figure(figsize=(20, 4))
-    for i in range(len(misclassified_images)):
-        ax = fig.add_subplot(2, 5, i + 1)
-        image = misclassified_images[i].cpu().numpy().transpose(1, 2, 0)
-        label = misclassified_labels[i].cpu().numpy().item()  # Convert to integer
-        prediction = misclassified_predictions[i].cpu().numpy().item()  # Convert to integer
-        # Normalize image data
-        image = (image - np.min(image)) / (np.max(image) - np.min(image))
-        ax.imshow(image)
-        ax.set_title(f'Label: {classes[label]}\nPrediction: {classes[prediction]}')
-        ax.axis('off')
+def plot_misclassified(model, test_loader, classes, device, no_misclf=20, plot_size=(4,5), grad_CAM=False):
 
-    plt.tight_layout()
-    plt.show()
+    def convert_image_np(inp, mean, std):
+      inp = inp.numpy().transpose((1, 2, 0))
+      inp = std * inp + mean
+      inp = np.clip(inp, 0, 1)
+      return inp
 
-# GradCAM visualization
-def show_misclassified_img_gradcam(model, target_layers, misclassified_images, misclassified_labels, misclassified_predictions, classes, plot_size=(2,5)):
-    print("Misclassified Images using GradCAM:")
-    # Apply GradCAM visualization to the first 10 misclassified images
-    cam = GradCAM(model=model, target_layers=target_layers, use_cuda=True)
+    count = 0
+    k = 0
+    misclf = list()
+    dataset_mean, dataset_std = np.array([0.49139968, 0.48215841, 0.44653091]), np.array([0.24703223, 0.24348513, 0.26158784])
+  
+    while count<no_misclf:
+        img_model, label = test_loader.dataset[k]
+        pred = model(img_model.unsqueeze(0).to(device)) # Prediction
+        # pred = model(img.unsqueeze(0).to(device)) # Prediction
+        pred = pred.argmax().item()
+
+        k += 1
+        if pred!=label:
+            img = convert_image_np(
+                img_model, dataset_mean, dataset_std)
+            misclf.append((img_model, img, label, pred))
+            count += 1
+    
     rows, cols = plot_size
-    figure = plt.figure(figsize=(cols*3,rows*3))
+    figure = plt.figure(figsize=(cols*2,rows*2))
+    print("Misclassified images\n")
+    for i in range(1, cols * rows + 1):
+        _, img, label, pred = misclf[i-1]
 
-    for i in range(0, cols*rows):
-
-        image = misclassified_images[i].cpu().numpy().transpose(1, 2, 0)
-        label = misclassified_labels[i].cpu().numpy().item()
-        prediction = misclassified_predictions[i].cpu().numpy().item()
-
-        
-        targets = [ClassifierOutputTarget(label)]
-        grayscale_cam = cam(input_tensor=image.unsqueeze(0), targets=targets)
-        grayscale_cam = grayscale_cam[0, :]
         figure.add_subplot(rows, cols, i) # adding sub plot
-        plt.title(f"Pred label: {classes[pred]}\n True label: {classes[label]}") # title of plot
+        plt.title(f"Prediction: {classes[pred]}\n Target: {classes[label]}") # title of plot
         plt.axis("off") # hiding the axis
-        plt.imshow(img) # showing the plot
-        plt.imshow(grayscale_cam, cmap='jet', alpha=0.40)
+        plt.imshow(img, cmap="gray") # showing the plot
 
     plt.tight_layout()
     plt.show()
+    
+    if grad_CAM:
+      print("\n\nMisclassified images using GradCAM\n")
+      grad_cam = GradCAM(model=model, target_layers=[model.layer4[-1]],use_cuda=True)
 
+      img_model, img, label, pred = misclf[0]
+      targets = [ClassifierOutputTarget(label)]
 
+      grayscale_cam = grad_cam(input_tensor=img_model.unsqueeze(0), targets=targets)
+      # In this example grayscale_cam has only one image in the batch:
+      grayscale_cam = grayscale_cam[0, :]
+
+      output = show_cam_on_image(img, grayscale_cam, use_rgb=True)
+
+      rows, cols = plot_size
+      figure = plt.figure(figsize=(cols*2,rows*2))
+
+      for i in range(1, cols * rows + 1):
+          img_model, img, label, pred = misclf[i-1]
+          targets = [ClassifierOutputTarget(label)]
+          grayscale_cam = grad_cam(input_tensor=img_model.unsqueeze(0), targets=targets)
+          grayscale_cam = grayscale_cam[0, :]
+          output = show_cam_on_image(img, grayscale_cam, use_rgb=True)
+          figure.add_subplot(rows, cols, i) # adding sub plot
+          plt.title(f"Prediction: {classes[pred]}\n Target: {classes[label]}") # title of plot
+          plt.axis("off") # hiding the axis
+          plt.imshow(output, cmap='gray', alpha=0.40)
+
+      plt.tight_layout()
+      plt.show()
 
 
 # plots train and test accuracy and losses
 def show_accuracy_loss(train_losses, train_acc, test_losses, test_acc):
-    train_loss_array = [x.item() for x in train_losses]
     fig, axs = plt.subplots(2,2,figsize=(15,10))
-    axs[0, 0].plot(train_loss_array)
+    axs[0, 0].plot(train_losses)
     axs[0, 0].set_title("Training Loss")
     axs[1, 0].plot(train_acc)
     axs[1, 0].set_title("Training Accuracy")
