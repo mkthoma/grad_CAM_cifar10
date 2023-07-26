@@ -95,7 +95,7 @@ In the [repo](https://github.com/mkthoma/grad_CAM_cifar10/blob/main/main.py) we 
 
 We found the maximum LR as
 
-![image](https://github.com/mkthoma/grad_CAM_cifar10/assets/95399001/78d065de-85e8-4de2-ad5a-4729d61a307e)
+![image](https://github.com/mkthoma/era_v1/assets/135134412/a3b998f5-9ff1-421a-a6d2-3daa9fb7d939)
 
 ## One Cycle LR Policy
 The One Cycle Learning Rate (LR) policy is a learning rate scheduling strategy that aims to improve the training process by varying the learning rate over the course of training. It was introduced by Leslie N. Smith in the paper "Super-Convergence: Very Fast Training of Neural Networks Using Large Learning Rates."
@@ -318,64 +318,65 @@ Non-trainable params: 0
      ```
 
 ## Training and Test Accuracies
-From the plots below we can see that we have achieved accuracy greater than 90% from about $18^{th}$ epoch.
+From the plots below we can see that we have achieved accuracy greater than 90% from about $16^{th}$ epoch.
+
+![image](https://github.com/mkthoma/era_v1/assets/135134412/64284bbc-6773-41eb-8369-b812fb9a8d08)
+
 
 ```
 EPOCH: 15
-Batch_id=390: 100%|██████████| 391/391 [00:45<00:00,  8.68it/s]
-Train Average Loss: 0.3034
-Train Accuracy: 89.60%
-Maximum Learning Rate:  0.00016584911438398897
-Test Average loss: 0.3454
-Test Accuracy: 88.45%
+Batch_id=390: 100%|██████████| 391/391 [00:46<00:00,  8.46it/s]
+Train Average Loss: 0.2140
+Train Accuracy: 92.41%
+Maximum Learning Rate:  0.033322951406649606
+Test Average loss: 0.3443
+Test Accuracy: 89.61%
 
 
 EPOCH: 16
-Batch_id=390: 100%|██████████| 391/391 [00:45<00:00,  8.68it/s]
-Train Average Loss: 0.2646
-Train Accuracy: 90.83%
-Maximum Learning Rate:  0.00013267227530415108
-Test Average loss: 0.3324
-Test Accuracy: 89.03%
+Batch_id=390: 100%|██████████| 391/391 [00:46<00:00,  8.48it/s]
+Train Average Loss: 0.1864
+Train Accuracy: 93.27%
+Maximum Learning Rate:  0.0266569514066496
+Test Average loss: 0.3329
+Test Accuracy: 90.11%
 
 
 EPOCH: 17
-Batch_id=390: 100%|██████████| 391/391 [00:45<00:00,  8.64it/s]
-Train Average Loss: 0.2269
-Train Accuracy: 92.18%
-Maximum Learning Rate:  9.949543622431325e-05
-Test Average loss: 0.3023
-Test Accuracy: 89.98%
+Batch_id=390: 100%|██████████| 391/391 [00:45<00:00,  8.51it/s]
+Train Average Loss: 0.1652
+Train Accuracy: 94.32%
+Maximum Learning Rate:  0.01999095140664961
+Test Average loss: 0.3370
+Test Accuracy: 90.44%
 
 
 EPOCH: 18
-Batch_id=390: 100%|██████████| 391/391 [00:45<00:00,  8.59it/s]
-Train Average Loss: 0.1922
-Train Accuracy: 93.54%
-Maximum Learning Rate:  6.631859714447541e-05
-Test Average loss: 0.2834
-Test Accuracy: 90.75%
+Batch_id=390: 100%|██████████| 391/391 [00:46<00:00,  8.45it/s]
+Train Average Loss: 0.1412
+Train Accuracy: 94.96%
+Maximum Learning Rate:  0.013324951406649618
+Test Average loss: 0.3231
+Test Accuracy: 90.80%
 
 
 EPOCH: 19
-Batch_id=390: 100%|██████████| 391/391 [00:45<00:00,  8.64it/s]
-Train Average Loss: 0.1585
-Train Accuracy: 94.74%
-Maximum Learning Rate:  3.314175806463758e-05
-Test Average loss: 0.2552
-Test Accuracy: 91.44%
+Batch_id=390: 100%|██████████| 391/391 [00:46<00:00,  8.44it/s]
+Train Average Loss: 0.1191
+Train Accuracy: 95.90%
+Maximum Learning Rate:  0.006658951406649613
+Test Average loss: 0.3132
+Test Accuracy: 91.43%
 
 
 EPOCH: 20
-Batch_id=390: 100%|██████████| 391/391 [00:45<00:00,  8.62it/s]
-Train Average Loss: 0.1281
-Train Accuracy: 95.82%
-Maximum Learning Rate:  -3.50810152003082e-08
-Test Average loss: 0.2497
-Test Accuracy: 91.81%
+Batch_id=390: 100%|██████████| 391/391 [00:46<00:00,  8.46it/s]
+Train Average Loss: 0.0979
+Train Accuracy: 96.59%
+Maximum Learning Rate:  -7.048593350378329e-06
+Test Average loss: 0.3175
+Test Accuracy: 91.50%
 ```
-
-![image](https://github.com/mkthoma/grad_CAM_cifar10/assets/95399001/da094818-fce8-4f0f-bc9c-cf186a085863)
 
 ## Misclassified Images
 Now we shall look at the misclassified images that are present after applying the model on the dataset.
