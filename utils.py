@@ -214,7 +214,6 @@ def plot_misclassified(model, test_loader, classes, device, no_misclf=20, plot_s
       print("\n\nMisclassified images using GradCAM\n")
       grad_cam = GradCAM(model=model, target_layers=[model.layer4[-1]],use_cuda=True)
 
-      img_model, img, label, pred = misclf[0]
       targets = [ClassifierOutputTarget(label)]
 
       grayscale_cam = grad_cam(input_tensor=img_model.unsqueeze(0), targets=targets)

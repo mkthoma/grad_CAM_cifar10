@@ -21,11 +21,6 @@ The detailed git repo can be found [here](https://github.com/mkthoma/era_v1/tree
 3. Import libraries
      ```python
      from __future__ import print_function
-     import torch
-     import torch.optim as optim
-     import albumentations as A
-     from albumentations.pytorch import ToTensorV2
-     import torch.nn as nn
      from grad_CAM_cifar10.models.resnet import ResNet18
      from grad_CAM_cifar10.utils import *
      from grad_CAM_cifar10.main import *
@@ -56,7 +51,7 @@ The detailed git repo can be found [here](https://github.com/mkthoma/era_v1/tree
      ```
 9. Apply train and test functions to the augmented data and see the accuracies and loss values.
      ```python
-     train_test_loop(model, device, train_loader, test_loader, max_LR, optimizer=optim.Adam(model.parameters(), lr=1e-5, weight_decay=1e-3), criterion=nn.CrossEntropyLoss(), EPOCHS=20)
+     train_test_loop(model, device, train_loader, test_loader, max_LR, lr_scheduler="OneCycle")
      ```
 10. Plot train/test accuracies and losses for the model
      ```python
@@ -71,62 +66,61 @@ The detailed git repo can be found [here](https://github.com/mkthoma/era_v1/tree
 
 From the plots below we can see that we have achieved accuracy greater than 90% from about $16^{th}$ epoch.
 
-![image](https://github.com/mkthoma/era_v1/assets/135134412/64284bbc-6773-41eb-8369-b812fb9a8d08)
-
+![image](https://github.com/mkthoma/era_v1/assets/95399001/eb8547e2-e352-4e71-8291-9a0957fb4ff2)
 
 ```
 EPOCH: 15
-Batch_id=390: 100%|██████████| 391/391 [00:46<00:00,  8.46it/s]
-Train Average Loss: 0.2140
-Train Accuracy: 92.41%
-Maximum Learning Rate:  0.033322951406649606
-Test Average loss: 0.3443
-Test Accuracy: 89.61%
+Batch_id=390: 100%|██████████| 391/391 [00:46<00:00,  8.49it/s]
+Train Average Loss: 0.1948
+Train Accuracy: 93.12%
+Maximum Learning Rate:  0.15467143915212617
+Test Average loss: 0.3493
+Test Accuracy: 89.39%
 
 
 EPOCH: 16
-Batch_id=390: 100%|██████████| 391/391 [00:46<00:00,  8.48it/s]
-Train Average Loss: 0.1864
-Train Accuracy: 93.27%
-Maximum Learning Rate:  0.0266569514066496
-Test Average loss: 0.3329
-Test Accuracy: 90.11%
+Batch_id=390: 100%|██████████| 391/391 [00:46<00:00,  8.47it/s]
+Train Average Loss: 0.1656
+Train Accuracy: 94.10%
+Maximum Learning Rate:  0.12373060798726337
+Test Average loss: 0.3388
+Test Accuracy: 90.50%
 
 
 EPOCH: 17
-Batch_id=390: 100%|██████████| 391/391 [00:45<00:00,  8.51it/s]
-Train Average Loss: 0.1652
-Train Accuracy: 94.32%
-Maximum Learning Rate:  0.01999095140664961
-Test Average loss: 0.3370
-Test Accuracy: 90.44%
+Batch_id=390: 100%|██████████| 391/391 [00:46<00:00,  8.45it/s]
+Train Average Loss: 0.1481
+Train Accuracy: 94.78%
+Maximum Learning Rate:  0.09278977682240058
+Test Average loss: 0.3462
+Test Accuracy: 90.43%
 
 
 EPOCH: 18
-Batch_id=390: 100%|██████████| 391/391 [00:46<00:00,  8.45it/s]
-Train Average Loss: 0.1412
-Train Accuracy: 94.96%
-Maximum Learning Rate:  0.013324951406649618
-Test Average loss: 0.3231
-Test Accuracy: 90.80%
+Batch_id=390: 100%|██████████| 391/391 [00:46<00:00,  8.44it/s]
+Train Average Loss: 0.1250
+Train Accuracy: 95.64%
+Maximum Learning Rate:  0.06184894565753779
+Test Average loss: 0.3461
+Test Accuracy: 90.76%
 
 
 EPOCH: 19
-Batch_id=390: 100%|██████████| 391/391 [00:46<00:00,  8.44it/s]
-Train Average Loss: 0.1191
-Train Accuracy: 95.90%
-Maximum Learning Rate:  0.006658951406649613
-Test Average loss: 0.3132
-Test Accuracy: 91.43%
+Batch_id=390: 100%|██████████| 391/391 [00:46<00:00,  8.49it/s]
+Train Average Loss: 0.1043
+Train Accuracy: 96.38%
+Maximum Learning Rate:  0.030908114492675
+Test Average loss: 0.3372
+Test Accuracy: 90.90%
 
 
 EPOCH: 20
-Batch_id=390: 100%|██████████| 391/391 [00:46<00:00,  8.46it/s]
-Train Average Loss: 0.0979
-Train Accuracy: 96.59%
-Maximum Learning Rate:  -7.048593350378329e-06
-Test Average loss: 0.3175
-Test Accuracy: 91.50%
+Batch_id=390: 100%|██████████| 391/391 [00:45<00:00,  8.50it/s]
+Train Average Loss: 0.0858
+Train Accuracy: 97.12%
+Maximum Learning Rate:  -3.2716672187793616e-05
+Test Average loss: 0.3224
+Test Accuracy: 91.74%
 ```
 
 ## Misclassified Images

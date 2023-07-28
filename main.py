@@ -1,9 +1,9 @@
 from __future__ import print_function
 import torch
 import torch.optim as optim
+from torch.optim.lr_scheduler import OneCycleLR
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
-from torch.optim.lr_scheduler import OneCycleLR
 from torch_lr_finder import LRFinder
 from tqdm import tqdm
 import matplotlib.pyplot as plt
@@ -87,28 +87,44 @@ def get_incorrect_preds(prediction, labels):
     return indices, prediction[indices].tolist(), labels[indices].tolist()
 
 # Train Function
-def train(model, device, lr_scheduler, criterion, train_loader, optimizer, epoch):
+def train(model, device, criterion, train_loader, optimizer, epoch, lr_scheduler):
     model.train()
     pbar = tqdm(train_loader)
     train_loss = 0
     correct = 0
     processed = 0
+    if lr_scheduler == None:
+        for batch_idx, (data, target) in enumerate(pbar):
+            data, target = data.to(device), target.to(device)
+            optimizer.zero_grad()
+            # Predict
+            pred = model(data)
+            # Calculate loss
+            loss = criterion(pred, target)
+            train_loss += loss.item() * len(data)
+            # Backpropagation
+            loss.backward()
+            optimizer.step()
+            correct += get_correct_count(pred, target)
+            processed += len(data)
+            pbar.set_description(desc= f'Batch_id={batch_idx}')
 
-    for batch_idx, (data, target) in enumerate(pbar):
-        data, target = data.to(device), target.to(device)
-        optimizer.zero_grad()
-        # Predict
-        pred = model(data)
-        # Calculate loss
-        loss = criterion(pred, target)
-        train_loss += loss.item() * len(data)
-        # Backpropagation
-        loss.backward()
-        optimizer.step()
-        correct += get_correct_count(pred, target)
-        processed += len(data)
-        pbar.set_description(desc= f'Batch_id={batch_idx}')
-        lr_scheduler.step()
+    else:
+        for batch_idx, (data, target) in enumerate(pbar):
+            data, target = data.to(device), target.to(device)
+            optimizer.zero_grad()
+            # Predict
+            pred = model(data)
+            # Calculate loss
+            loss = criterion(pred, target)
+            train_loss += loss.item() * len(data)
+            # Backpropagation
+            loss.backward()
+            optimizer.step()
+            correct += get_correct_count(pred, target)
+            processed += len(data)
+            pbar.set_description(desc= f'Batch_id={batch_idx}')
+            lr_scheduler.step()
 
     train_acc = 100 * correct / processed
     train_loss /= processed
@@ -146,23 +162,50 @@ def test(model, device, criterion, test_loader):
     print(f"Test Accuracy: {test_acc:0.2f}%")
 
 
+def get_optimizer(model, optimizer_input="SGD", lr=0.01):
+    optimizer_mapping = {
+        'SGD': optim.SGD(model.parameters(), lr=lr, momentum=0.9),
+        'Adam': optim.Adam(model.parameters(), lr=lr),
+        'RMSprop': optim.RMSprop(model.parameters(), lr=lr),
+        'Adagrad': optim.Adagrad(model.parameters(), lr=lr),
+        'AdamW': optim.AdamW(model.parameters(), lr=lr)
+        # Add more optimizers as needed
+    }
+
+    if optimizer_input not in optimizer_mapping:
+        raise ValueError("Invalid optimizer name. Available options are: {}".format(list(optimizer_mapping.keys())))
+
+    optimizer_class = optimizer_mapping[optimizer_input]
+    return optimizer_class
+
+
 #  Train and test function call based on number of epochs
-def train_test_loop(model, device, train_loader, test_loader, max_LR, optimizer, criterion, EPOCHS=20):
-
-    # Define the number of epochs and the max epoch for max learning rate
-    max_lr_epoch = 5
-
-    # Define the learning rate scheduler with max LR from LRFinder
-    # Max LR is achieved by 5th epoch
-    # Annealing is set to false by three_phase=False
-    lr_scheduler = OneCycleLR(optimizer, max_lr=max_LR, steps_per_epoch=len(train_loader), epochs=EPOCHS,
-                            pct_start=max_lr_epoch/EPOCHS, div_factor=100, three_phase=False, final_div_factor=100,
-                            anneal_strategy='linear')
+def train_test_loop(model, device, train_loader, test_loader, max_LR, max_lr_epoch=5, criterion=nn.CrossEntropyLoss(), optimizer="SGD", EPOCHS=20, lr_scheduler=None, lr=0.01):
+    optimizer = get_optimizer(model, optimizer, lr)
+    if lr_scheduler == "OneCycle":
+        lr_scheduler = OneCycleLR(optimizer, max_lr=max_LR, steps_per_epoch=len(train_loader), epochs=EPOCHS,
+                        pct_start=max_lr_epoch/EPOCHS, div_factor=100, three_phase=False, final_div_factor=100,
+                        anneal_strategy='linear')
 
     # Passing each batch to train and test in train_test module
     for epoch in range(EPOCHS):
         print("EPOCH:", epoch+1)
-        train(model, device, lr_scheduler, criterion, train_loader, optimizer, epoch)
+        train(model, device, criterion, train_loader, optimizer, epoch, lr_scheduler)
         test(model, device, criterion, test_loader)
-        print("\n")
+        print("\n") 
 
+
+def main(optimizer="SGD", dataloader_args=dict(shuffle=True, batch_size=128, num_workers=2, pin_memory=True), lr_scheduler=None, grad_CAM=False, criterion=nn.CrossEntropyLoss(), EPOCHS=20, max_lr_epoch=5, lr=0.01):
+    device = select_cuda()
+    train_data, test_data, train_loader, test_loader, classes = download_data(dataloader_args)
+    show_random_samples(test_loader, classes)
+    show_class_samples(test_loader, classes)
+    show_image_rgb(test_loader, classes)
+    model = select_model(device)
+    max_LR = max_lr(model, train_loader)
+    train_test_loop(model, device, train_loader, test_loader, max_LR, max_lr_epoch, criterion, optimizer, EPOCHS, lr_scheduler, lr)            
+    show_accuracy_loss(train_losses, train_accuracies, test_losses, test_accuracies)
+    plot_misclassified(model, test_loader, classes, device, grad_CAM, no_misclf=20, plot_size=(4,5))
+
+if __name__ == '__main__':
+    main()
